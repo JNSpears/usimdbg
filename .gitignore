@@ -1,0 +1,10 @@
+machdep
+machdep.h
+*.o
+*.a
+*.bak
+*.sublime-workspace
+lexer.[ch]pp
+parser.[ch]pp
+parser.output
+usimd
