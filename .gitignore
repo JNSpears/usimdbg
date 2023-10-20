@@ -9,3 +9,5 @@ parser.[ch]pp
 parser.output
 usimdbg
 **/*.log
+tests/test.s
+tests/test_main.*
