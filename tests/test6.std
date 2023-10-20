@@ -1,0 +1,60 @@
+>> load 'tests/test_main.sym
+	0000 - fff0
+>> step
+PC:E000 CC:-F-I---- S:0000 U:0000 A:00 B:00 X:0000 Y:0000 DP:00
+/ E000: [ 4] LDS     #$200
+>> asm $ len 20 
+
+E004:  CE0400      	ldu   #user_stack  	($0400)
+E007:  1A50        	orcc  #$0050
+E009:  308D00FC    	leax  _e109,pc
+E00D:  17008E      	lbsr  putstr      	($e09e)
+E010:  3636        	pshu  y,x,b,a
+E012:  3736        	pulu  a,b,x,y
+E014:  3001        	leax  1,x
+E016:  8680        	lda   #$80
+E018:  B7C000      	sta   uart        	($C000)
+                   loop:
+E01B:  3CBF        	cwai  #$00BF
+E01D:  9600        	lda   inchar      	($00)
+E01F:  BDE0AB      	jsr   puthexbyte  	($E0AB)
+E022:  1E89        	exg   a,b
+E024:  3F          	swi   
+E025:  20F4        	bra   loop        	($e01b)
+                   test:
+E027:  39          	rts   
+                   status:
+E028:  8EE07D      	ldx   #str_cc      	($E07D)
+E02B:  170070      	lbsr  putstr      	($e09e)
+E02E:  A6E4        	lda   ,s
+E030:  847F        	anda  #$7F
+E032:  170076      	lbsr  puthexbyte  	($e0ab)
+E035:  8EE082      	ldx   #str_a       	($E082)
+E038:  170063      	lbsr  putstr      	($e09e)
+E03B:  A661        	lda   1,s
+E03D:  17006B      	lbsr  puthexbyte  	($e0ab)
+E040:  8EE087      	ldx   #str_b       	($E087)
+E043:  170058      	lbsr  putstr      	($e09e)
+E046:  A662        	lda   2,s
+E048:  170060      	lbsr  puthexbyte  	($e0ab)
+E04B:  8EE08C      	ldx   #str_dp      	($E08C)
+E04E:  17004D      	lbsr  putstr      	($e09e)
+E051:  A663        	lda   3,s
+>> asm "status len 8
+
+                   status:
+E028:  8EE07D      	ldx   #str_cc      	($E07D)
+E02B:  170070      	lbsr  putstr      	($e09e)
+E02E:  A6E4        	lda   ,s
+E030:  847F        	anda  #$7F
+E032:  170076      	lbsr  puthexbyte  	($e0ab)
+E035:  8EE082      	ldx   #str_a       	($E082)
+E038:  170063      	lbsr  putstr      	($e09e)
+E03B:  A661        	lda   1,s
+>> eval "str_cc
+	1110000001111101	0160175	57469	$e07d	'_'
+>> byte "str_cc len 20
+
+E07D: 20 43 43 3a 00 20 20 41  3a 00 20 20 42 3a 00 20 | CC:.  A  :.  B:. |
+E08D: 44 50 3a 00 20 20 58 3a  00 20 20 59 3a 00 0d 0a |DP:.  X:  .  Y:...|
+>> 

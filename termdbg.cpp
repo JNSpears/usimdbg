@@ -65,9 +65,13 @@ void TerminalDbg::tilde_escape_do_other(char ch)
 
 ./usimd ../usim/tests/test_main.hex
 go
-abc
-XYZ
-123
-~.
+a
+Z
+1
+2
+3
+
+~
+.
 
 */

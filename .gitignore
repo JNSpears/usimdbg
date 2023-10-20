@@ -7,4 +7,5 @@ machdep.h
 lexer.[ch]pp
 parser.[ch]pp
 parser.output
-usimd
+usimdbg
+**/*.log

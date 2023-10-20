@@ -1,0 +1,66 @@
+>> load 'tests/test_main.sym
+	0000 - fff0
+>> sym         # all
+0000 inchar
+0200 system_stack
+0400 user_stack
+C000 uart
+E000 rom_start
+E01B loop
+E027 test
+E028 status
+E07D str_cc
+E082 str_a
+E087 str_b
+E08C str_dp
+E091 str_x
+E096 str_y
+E09B str_nl
+E09E putstr
+E0A0 putstr_loop
+E0A8 putstr_done
+E0AB puthexbyte
+E0BD puthexdigit
+E0C9 _puthexdigit1
+E0CE putchar
+E0D0 _putchar1
+E0DD getchar
+E0E8 toupper
+E0F4 toupper_done
+E0F7 tolower
+E103 tolower_done
+E106 prompt_str
+E109 system_ready
+E122 handle_irq
+E123 handle_firq
+E132 irq_done
+E135 handle_undef
+E136 handle_swi2
+E137 handle_swi3
+E138 handle_nmi
+FFF0 vector_table
+>> sym 'put
+E09E putstr
+E0A0 putstr_loop
+E0A8 putstr_done
+E0AB puthexbyte
+E0BD puthexdigit
+E0CE putchar
+>> sym 'testabc
+>> sym 't
+E027 test
+E0E8 toupper
+E0F4 toupper_done
+E0F7 tolower
+E103 tolower_done
+>> sym 0 len 400+1
+0000 inchar
+0200 system_stack
+0400 user_stack
+>> sym 0e000 to 0e080
+E000 rom_start
+E01B loop
+E027 test
+E028 status
+E07D str_cc
+>> 

@@ -1,0 +1,65 @@
+>> br 0E0D0 occurs 2
+>> br
+(0)  TriggerEventCount: #=2 [TriggerOnPc: pc=E0D0] -> ActionBreak
+>> go
+  ** TriggerEventCount: #=0 [TriggerOnPc: pc=E0D0] **
+>> go
+  ** TriggerEventCount: #=0 [TriggerOnPc: pc=E0D0] **
+>> trace 999
+
+(000) R E000 @ fffe
+(001) X e000  LDS     #$200
+(002) X e004  LDU     #$400
+(003) X e007  ORCC    #$50
+(004) X e009  LEAX    252,PCR
+(005) X e00d  LBSR    $E09E
+(006) W   10 @ 01ff
+(007) W   E0 @ 01fe
+(008) X e09e  PSHS    CC,A,X
+(009) W   09 @ 01fd
+(010) W   E1 @ 01fc
+(011) W   00 @ 01fb
+(012) W   50 @ 01fa
+(013) X e0a0  LDA     ,X+
+(014) R   53 @ e109
+(015) X e0a2  BEQ     $E0A8
+(016) X e0a4  BSR     $E0CE
+(017) W   A6 @ 01f9
+(018) W   E0 @ 01f8
+(019) X e0ce  PSHS    A
+(020) W   53 @ 01f7
+(021) X e0d0  LDA     $C000
+(022) R   02 @ c000
+(023) X e0d3  BITA    #$02
+(024) X e0d5  BEQ     $E0D0
+(025) X e0d7  PULS    A
+(026) R   53 @ 01f7
+(027) X e0d9  STA     $C001
+(028) W   53 @ c001
+(029) X e0dc  RTS     
+(030) R   E0 @ 01f8
+(031) R   A6 @ 01f9
+(032) X e0a6  BRA     $E0A0
+(033) X e0a0  LDA     ,X+
+(034) R   79 @ e10a
+(035) X e0a2  BEQ     $E0A8
+(036) X e0a4  BSR     $E0CE
+(037) W   A6 @ 01f9
+(038) W   E0 @ 01f8
+(039) X e0ce  PSHS    A
+(040) W   79 @ 01f7
+(041) X e0d0  LDA     $C000
+(042) R   00 @ c000
+(043) X e0d3  BITA    #$02
+(044) X e0d5  BEQ     $E0D0
+(045) X e0d0  LDA     $C000
+(046) R   00 @ c000
+>> reset
+>> trace clear
+>> br 0E0D0 occurs 1
+>> br
+(0)  TriggerEventCount: #=0 [TriggerOnPc: pc=E0D0] -> ActionBreak
+(1)  TriggerEventCount: #=1 [TriggerOnPc: pc=E0D0] -> ActionBreak
+>> trace 999
+
+>> 

@@ -1,0 +1,42 @@
+>> step 8 # 8 instructions
+PC:E000 CC:-F-I---- S:0000 U:0000 A:00 B:00 X:0000 Y:0000 DP:00
+/ E000: [ 4] LDS     #$200
+PC:E004 CC:-F-I---- S:0200 U:0000 A:00 B:00 X:0000 Y:0000 DP:00
+/ E004: [ 3] LDU     #$400
+PC:E007 CC:-F-I---- S:0200 U:0400 A:00 B:00 X:0000 Y:0000 DP:00
+/ E007: [ 3] ORCC    #$50
+PC:E009 CC:-F-I---- S:0200 U:0400 A:00 B:00 X:0000 Y:0000 DP:00
+/ E009: [ 8] LEAX    252,PCR
+PC:E00D CC:-F-I---- S:0200 U:0400 A:00 B:00 X:E109 Y:0000 DP:00
+/ E00D: [ 9] LBSR    $E09E
+PC:E09E CC:-F-I---- S:01FE U:0400 A:00 B:00 X:E109 Y:0000 DP:00
+/ E09E: [ 9] PSHS    CC,A,X
+PC:E0A0 CC:-F-I---- S:01FA U:0400 A:00 B:00 X:E109 Y:0000 DP:00
+/ E0A0: [ 6] LDA     ,X+
+PC:E0A2 CC:-F-I---- S:01FA U:0400 A:53 B:00 X:E10A Y:0000 DP:00
+/ E0A2: [ 3] BEQ     $E0A8
+>> trace 999 # all frames
+
+(000) R E000 @ fffe
+(001) X e000  LDS     #$200
+(002) X e004  LDU     #$400
+(003) X e007  ORCC    #$50
+(004) X e009  LEAX    252,PCR
+(005) X e00d  LBSR    $E09E
+(006) W   10 @ 01ff
+(007) W   E0 @ 01fe
+(008) X e09e  PSHS    CC,A,X
+(009) W   09 @ 01fd
+(010) W   E1 @ 01fc
+(011) W   00 @ 01fb
+(012) W   50 @ 01fa
+(013) X e0a0  LDA     ,X+
+(014) R   53 @ e109
+(015) X e0a2  BEQ     $E0A8
+>> asm $ len 1
+
+E0A4:  8D28        	bsr   e0ce
+>> step
+PC:E0A4 CC:-F-I---- S:01FA U:0400 A:53 B:00 X:E10A Y:0000 DP:00
+/ E0A4: [ 7] BSR     $E0CE
+>> 

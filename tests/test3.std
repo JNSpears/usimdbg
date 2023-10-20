@@ -1,0 +1,12 @@
+>> load 'tests/test_main.ihex  base 400
+	e400 - 103ff
+>> load 'tests/test_main.s19
+[lwtools 4.19] tests/test_main.s
+	e000 - ffff
+>> load 'tests/test_main.bin
+	0000 - 0149
+>> load 'tests/test_main.sym
+	0000 - fff0
+>> load 'tests/test_main.map
+	0000 - fff0
+>> 

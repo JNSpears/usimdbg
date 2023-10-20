@@ -1,26 +1,29 @@
 USIM_PATH	= ../usim/
 
-SHELL=/bin/bash
+SHELL 		= /bin/bash
 CC 			= g++
 CPPFLAGS 	= -O3  -I $(USIM_PATH)  --std=c++17
-  
+DIFFFLAGS   = --ignore-all-space -s -q
+
 DLIB_SRCS	= parser.cpp lexer.cpp hexadump.cpp mc6809dbg.cpp BreakTrace.cpp \
 			  Trigger.cpp Action.cpp termdbg.cpp range.cpp Symbol.cpp
 DOBJS		= $(DLIB_SRCS:.cpp=.o) 6309dasm.o
-DLIB		= libusimd.a
+DLIB		= libusimdbg.a
 
-DBIN		= usimd
+DBIN		= usimdbg
 
 ##########################################################################################
 
-all: $(DBIN)
+all: $(DBIN) tests
 
-$(DLIB): $(DLIB)($(DOBJS))
+$(DLIB): $(DOBJS)
+	ar crs $(@) $^
+	ranlib $(@)
 
 $(DBIN): $(DLIB) main.o
-	$(CXX) $(CCFLAGS) $(LDFLAGS) main.o $(USIM_PATH)term.o -lreadline -L. -L$(USIM_PATH) -lusim -lusimd -o $(@)
+	$(CXX) $(CCFLAGS) $(LDFLAGS) main.o $(USIM_PATH)term.o -lreadline -L. -L$(USIM_PATH) -lusim -lusimdbg -o $(@)
 
-lexer.cpp: lexer.l
+lexer.cpp lexer.hpp: lexer.l
 	flex -i --header-file=lexer.hpp -o lexer.cpp lexer.l 
 
 parser.cpp parser.hpp: parser.y
@@ -31,7 +34,7 @@ parser.cpp parser.hpp: parser.y
 ##########################################################################################
 
 clean:
-	$(RM) lexer.cpp parser.cpp parser.hpp parser.output $(DBIN) *.o
+	$(RM) lexer.[hc]pp parser.[ch]pp parser.output $(DBIN) *.o $(DLIB)
 
 ##########################################################################################
 
@@ -42,36 +45,52 @@ depend:
 
 .ONESHELL:
 
-test: test1 test2 test3 test4 test5 test6 test7 test8 test10 test11
+tests: testsetup test1 test2 test3 test4 test5 test6 test7 test8 test10 test11
 
-test1:
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
+tests/test_main.s: $(USIM_PATH)tests/test_main.s
+	cp $^ $@
+
+tests/test.s: $(USIM_PATH)tests/test.s
+	cp $^ $@
+
+tests/test_main.ihex tests/test_main.sym tests/test_main.map: tests/test_main.s tests/test.s
+	lwasm tests/test_main.s -fihex -otests/test_main.ihex --symbol-dump=tests/test_main.sym --map=tests/test_main.map  -ltests/test_main.lst
+tests/test_main.s19: tests/test_main.s tests/test.s
+	lwasm tests/test_main.s -fsrec -otests/test_main.s19
+tests/test_main.bin: tests/test_main.s tests/test.s
+	lwasm tests/test_main.s -fraw -otests/test_main.bin
+
+.PHONY:
+testsetup: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin
+
+test1: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	help
 	EOF
-	diff -s -q tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test2:
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
+test2: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	step 8 # 8 instructions
 	trace 999 # all frames
 	asm $$ len 1
 	step
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
 ABINFILE=../../../percom/mpx9/my-utils/HelloWorld
-test3:
-	cp $(ABINFILE).cm $(ABINFILE).bin
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
-	load '../../../percom/psymon/psymon.ihex base 400
-	load '../../../percom/mpx9/tForth/tforth09.s19
-	load '$(ABINFILE).bin
-	load '../../../percom/psymon/psymon.sym
-	load '../../../percom/mpx9/mpx9+/mpx9+.map
+test3: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin tests/test_main.sym tests/test_main.map
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
+	load 'tests/test_main.ihex  base 400
+	load 'tests/test_main.s19
+	load 'tests/test_main.bin
+	load 'tests/test_main.sym
+	load 'tests/test_main.map
 	EOF
-	rm $(ABINFILE).bin
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test4:
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
+test4: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	br
 	br 1234
 	br 1111 write 
@@ -80,9 +99,10 @@ test4:
 	br 6666 access 88 occurs 8
 	br
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test5:
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
+test5: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	byte 30 = 11,22,33,44,55,66,77,88,99
 	byte 44 len 7 = 12
 	byte 0 len 80
@@ -92,19 +112,21 @@ test5:
 	byte 7f = 0bb
 	byte 0 len 90
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test6:
-	./$(DBIN) ../../../percom/psymon/psymon.ihex >tests/$(@).log 2>&1 <<EOF
-	load '../../../percom/psymon/psymon.sym
+test6:tests/test_main.ihex tests/test_main.sym
+	./$(DBIN) tests/test_main.ihex  >tests/$(@).log 2>&1 <<EOF
+	load 'tests/test_main.sym
 	step
 	asm $$ len 20 
-	asm "GETCMD len 8
-	eval "PROMPT
-	byte "PROMPT
+	asm "status len 8
+	eval "str_cc
+	byte "str_cc len 20
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test7:
-	./$(DBIN) ../../../percom/psymon/psymon.ihex >tests/$(@).log 2>&1 <<EOF
+test7: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	byte 123
 	byte 123 len 12
 	byte 123 len 6
@@ -117,7 +139,6 @@ test7:
 	asm 0 len 1
 	asm 0 len 8
 	asm 0 to 10
-
 
 	byte 12 = 22,33,44,55,66,77,88,99,0aa,0bb,0cc
 	byte 0 len 40
@@ -158,10 +179,11 @@ test7:
 	word 6 to 11 = 1111,2222,3333,4444,5555,6666,7777,8888,9999,0aaaa,0bbbb,0cccc
 	word 0 len 20
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test8:
-	./$(DBIN) ../../../percom/psymon/psymon.ihex >tests/$(@).log 2>&1 <<EOF
-	load '../../../percom/psymon/psymon.sym
+test8: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
+	load 'tests/test_main.sym
 	step 6
 	regs
 	rx
@@ -175,9 +197,10 @@ test8:
 	reset
 	regs
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test9:
-	./$(DBIN) ../tests/abc.ihex >tests/$(@).log 2>&1 <<EOF
+test9: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	load '../tests/abc.sym
 	br "handle_swi
 	br
@@ -186,9 +209,10 @@ test9:
 	trace 8
 	asm $$ len 1
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test10:
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
+test10: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	br 0E0D0 occurs 2
 	br
 	go
@@ -203,18 +227,19 @@ test10:
 	trace 999
 
 	EOF
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
-test11:
-	./$(DBIN) ../tests/test_main.hex >tests/$(@).log 2>&1 <<EOF
-	load '../../../percom/psymon/psymon.sym
+test11: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
+	load 'tests/test_main.sym
 	sym         # all
-	sym 'Com
-	sym 'load
-	sym 'In
-	sym 1 len 10
-	sym 0fc00 to 0fc80
+	sym 'put
+	sym 'testabc
+	sym 't
+	sym 0 len 400+1
+	sym 0e000 to 0e080
 	EOF
-
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
 ##########################################################################################
 
@@ -226,25 +251,6 @@ main.o: /usr/include/alloca.h /usr/include/ctype.h BreakTrace.h Action.h
 main.o: Trigger.h TraceFrame.h range.h termdbg.h /usr/include/term.h
 main.o: /usr/include/ncurses_dll.h /usr/include/termios.h
 main.o: /usr/include/memory.h /usr/include/string.h /usr/include/strings.h
-parser.o: /usr/include/stdio.h /usr/include/stdlib.h /usr/include/alloca.h
-parser.o: /usr/include/features.h /usr/include/stdc-predef.h lexer.hpp
-parser.o: /usr/include/string.h /usr/include/strings.h /usr/include/errno.h
-parser.o: /usr/include/unistd.h hexadump.h mc6809dbg.h /usr/include/ctype.h
-parser.o: BreakTrace.h Action.h Trigger.h TraceFrame.h range.h termdbg.h
-parser.o: /usr/include/term.h /usr/include/ncurses_dll.h
-parser.o: /usr/include/termios.h /usr/include/memory.h Symbol.h
-parser.o: /usr/include/limits.h
-lexer.o: /usr/include/stdio.h /usr/include/string.h /usr/include/strings.h
-lexer.o: /usr/include/features.h /usr/include/stdc-predef.h
-lexer.o: /usr/include/errno.h /usr/include/stdlib.h /usr/include/alloca.h
-lexer.o: parser.hpp BreakTrace.h /usr/include/ctype.h Action.h Trigger.h
-lexer.o: TraceFrame.h mc6809dbg.h range.h termdbg.h /usr/include/term.h
-lexer.o: /usr/include/ncurses_dll.h /usr/include/termios.h
-lexer.o: /usr/include/readline/readline.h /usr/include/readline/rlstdc.h
-lexer.o: /usr/include/readline/rltypedefs.h /usr/include/readline/keymaps.h
-lexer.o: /usr/include/readline/chardefs.h /usr/include/readline/tilde.h
-lexer.o: /usr/include/readline/history.h /usr/include/time.h
-lexer.o: /usr/include/unistd.h
 hexadump.o: hexadump.h /usr/include/stdlib.h /usr/include/alloca.h
 hexadump.o: /usr/include/features.h /usr/include/stdc-predef.h
 hexadump.o: /usr/include/stdio.h
@@ -254,7 +260,7 @@ mc6809dbg.o: /usr/include/libgen.h mc6809dbg.h /usr/include/stdlib.h
 mc6809dbg.o: /usr/include/alloca.h /usr/include/ctype.h BreakTrace.h Action.h
 mc6809dbg.o: Trigger.h TraceFrame.h range.h termdbg.h /usr/include/term.h
 mc6809dbg.o: /usr/include/ncurses_dll.h /usr/include/termios.h hexadump.h
-mc6809dbg.o: /usr/include/stdio.h Symbol.h parser.hpp
+mc6809dbg.o: /usr/include/stdio.h Symbol.h
 BreakTrace.o: hexadump.h /usr/include/stdlib.h /usr/include/alloca.h
 BreakTrace.o: /usr/include/features.h /usr/include/stdc-predef.h
 BreakTrace.o: /usr/include/stdio.h /usr/include/string.h

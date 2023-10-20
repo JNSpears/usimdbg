@@ -14,7 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "lexer.hpp"
+//#include "lexer.hpp"
+extern int yylex();
 #include "hexadump.h"
 #include "mc6809dbg.h"   
 #include "termdbg.h"

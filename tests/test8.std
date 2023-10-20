@@ -1,0 +1,32 @@
+>> load 'tests/test_main.sym
+	0000 - fff0
+>> step 6
+PC:E000 CC:-F-I---- S:0000 U:0000 A:00 B:00 X:0000 Y:0000 DP:00
+/ E000: [ 4] LDS     #$200
+PC:E004 CC:-F-I---- S:0200 U:0000 A:00 B:00 X:0000 Y:0000 DP:00
+/ E004: [ 3] LDU     #$400
+PC:E007 CC:-F-I---- S:0200 U:0400 A:00 B:00 X:0000 Y:0000 DP:00
+/ E007: [ 3] ORCC    #$50
+PC:E009 CC:-F-I---- S:0200 U:0400 A:00 B:00 X:0000 Y:0000 DP:00
+/ E009: [ 8] LEAX    252,PCR
+PC:E00D CC:-F-I---- S:0200 U:0400 A:00 B:00 X:E109 Y:0000 DP:00
+/ E00D: [ 9] LBSR    $E09E
+PC:E09E CC:-F-I---- S:01FE U:0400 A:00 B:00 X:E109 Y:0000 DP:00
+/ E09E: [ 9] PSHS    CC,A,X
+>> regs
+PC:E0A0 CC:-F-I---- S:01FA U:0400 A:00 B:00 X:E109 Y:0000 DP:00
+>> rx
+E109
+>> ru
+0400
+>> rcc
+0050
+>> ra=0aa
+>> rb=0bb
+>> rx=1111
+>> regs
+PC:E0A0 CC:-F-I---- S:01FA U:0400 A:AA B:BB X:1111 Y:0000 DP:00
+>> reset
+>> regs
+PC:E000 CC:-F-I---- S:0000 U:0000 A:00 B:00 X:0000 Y:0000 DP:00
+>> 
