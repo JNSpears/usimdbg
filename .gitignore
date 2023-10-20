@@ -11,3 +11,4 @@ usimdbg
 **/*.log
 tests/test.s
 tests/test_main.*
+tests/summary

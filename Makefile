@@ -14,7 +14,7 @@ DBIN		= usimdbg
 
 ##########################################################################################
 
-all: $(DBIN) tests
+all: $(DBIN) test
 
 $(DLIB): $(DOBJS)
 	ar crs $(@) $^
@@ -45,7 +45,21 @@ depend:
 
 .ONESHELL:
 
-tests: testsetup test1 test2 test3 test4 test5 test6 test7 test8 test10 test11
+test: testsetup tests report
+
+.PHONY:
+testsetup: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin
+	rm -f tests/summary
+
+tests: test1 test2 test3 test4 test5 test6 test7 test8 test10 test11
+
+.PHONY:
+report:
+	@echo '--------------------------------------------------------------------'
+	@cat tests/summary | awk '{ gsub("differ", "\033[1m\033[1;31m&\033[0m"); gsub("identical", "\033[1;36m&\033[0m"); print }'
+	@echo '--------------------------------------------------------------------'
+	@echo  Resuts: `grep identical tests/summary | wc -l` of `cat tests/summary  | wc -l` passed
+	@echo '--------------------------------------------------------------------'
 
 tests/test_main.s: $(USIM_PATH)tests/test_main.s
 	cp $^ $@
@@ -60,14 +74,12 @@ tests/test_main.s19: tests/test_main.s tests/test.s
 tests/test_main.bin: tests/test_main.s tests/test.s
 	lwasm tests/test_main.s -fraw -otests/test_main.bin
 
-.PHONY:
-testsetup: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin
 
 test1: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
 	help
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test2: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -76,7 +88,7 @@ test2: tests/test_main.ihex
 	asm $$ len 1
 	step
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 ABINFILE=../../../percom/mpx9/my-utils/HelloWorld
 test3: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin tests/test_main.sym tests/test_main.map
@@ -87,7 +99,7 @@ test3: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin tests/test_m
 	load 'tests/test_main.sym
 	load 'tests/test_main.map
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test4: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -99,7 +111,7 @@ test4: tests/test_main.ihex
 	br 6666 access 88 occurs 8
 	br
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test5: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -112,7 +124,7 @@ test5: tests/test_main.ihex
 	byte 7f = 0bb
 	byte 0 len 90
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test6:tests/test_main.ihex tests/test_main.sym
 	./$(DBIN) tests/test_main.ihex  >tests/$(@).log 2>&1 <<EOF
@@ -123,7 +135,7 @@ test6:tests/test_main.ihex tests/test_main.sym
 	eval "str_cc
 	byte "str_cc len 20
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test7: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -179,7 +191,7 @@ test7: tests/test_main.ihex
 	word 6 to 11 = 1111,2222,3333,4444,5555,6666,7777,8888,9999,0aaaa,0bbbb,0cccc
 	word 0 len 20
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test8: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -209,7 +221,7 @@ test9: tests/test_main.ihex
 	trace 8
 	asm $$ len 1
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test10: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -227,7 +239,7 @@ test10: tests/test_main.ihex
 	trace 999
 
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 test11: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -239,7 +251,7 @@ test11: tests/test_main.ihex
 	sym 0 len 400+1
 	sym 0e000 to 0e080
 	EOF
-	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
+	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std | tee -a tests/summary
 
 ##########################################################################################
 
