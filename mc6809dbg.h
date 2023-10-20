@@ -31,6 +31,7 @@ public:
 	//
 	virtual void        invalid(const char*);
 	virtual void 		tick();
+	virtual void 		reset();
 
 	//
 	// New functions for debugger functionality.
