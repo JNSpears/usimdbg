@@ -50,7 +50,7 @@
 "<<"           {return LSL;}
 ">>"           {return LSR;}
 
-(S(TEP)?)      {return STEP;}
+(ST(EP)?)      {return STEP;}
 (G(O)?)        {return GO;}
 (R(EGS)?)      {return REGS;}
 "RESET"        {return RESET;}
@@ -102,16 +102,16 @@
 "Write"        {yylval.brk_typ = Write;  return XRWA;}
 "Access"       {yylval.brk_typ = Access; return XRWA;}
  
-"RA"           {yylval.reg_id.id = 8;  return REGID;}
-"RB"           {yylval.reg_id.id = 9;  return REGID;}
-"RCC"          {yylval.reg_id.id = 10; return REGID;}
-"RDP"          {yylval.reg_id.id = 11; return REGID;}
-"RD"           {yylval.reg_id.id = 0;  return REGID;}
-"RX"           {yylval.reg_id.id = 1;  return REGID;}
-"RY"           {yylval.reg_id.id = 2;  return REGID;}
-"RS"           {yylval.reg_id.id = 4;  return REGID;}
-"RU"           {yylval.reg_id.id = 3;  return REGID;}
-"RPC"          {yylval.reg_id.id = 5;  return REGID;}
+"A"            {yylval.reg_id.id = 8;  return REGID;}
+"B"            {yylval.reg_id.id = 9;  return REGID;}
+"CC"           {yylval.reg_id.id = 10; return REGID;}
+"DP"           {yylval.reg_id.id = 11; return REGID;}
+"D"            {yylval.reg_id.id = 0;  return REGID;}
+"X"            {yylval.reg_id.id = 1;  return REGID;}
+"Y"            {yylval.reg_id.id = 2;  return REGID;}
+"S"            {yylval.reg_id.id = 4;  return REGID;}
+"U"            {yylval.reg_id.id = 3;  return REGID;}
+"PC"           {yylval.reg_id.id = 5;  return REGID;}
 "$"            {yylval.reg_id.id = 5;  return REGID;}
 
 ([0-9][0-9A-F]*)        {
