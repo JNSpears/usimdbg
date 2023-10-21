@@ -45,13 +45,13 @@ depend:
 
 .ONESHELL:
 
-test: testsetup tests report
+tests: testsetup test-all report
 
 .PHONY:
 testsetup: tests/test_main.ihex tests/test_main.s19 tests/test_main.bin
 	rm -f tests/summary
 
-tests: test1 test2 test3 test4 test5 test6 test7 test8 test10 test11
+test-all: test1 test2 test3 test4 test5 test6 test7 test8 test10 test11
 
 .PHONY:
 report:
@@ -68,11 +68,11 @@ tests/test.s: $(USIM_PATH)tests/test.s
 	cp $^ $@
 
 tests/test_main.ihex tests/test_main.sym tests/test_main.map: tests/test_main.s tests/test.s
-	lwasm tests/test_main.s -fihex -otests/test_main.ihex --symbol-dump=tests/test_main.sym --map=tests/test_main.map  -ltests/test_main.lst
+	lwasm $< -fihex -o$(basename $@).ihex --symbol-dump=$(basename $@).sym --map=$(basename $@).map  -l$(basename $@).lst
 tests/test_main.s19: tests/test_main.s tests/test.s
-	lwasm tests/test_main.s -fsrec -otests/test_main.s19
+	lwasm $< -fsrec -o$(basename $@).s19
 tests/test_main.bin: tests/test_main.s tests/test.s
-	lwasm tests/test_main.s -fraw -otests/test_main.bin
+	lwasm $< -fraw -o$(basename $@).bin
 
 
 test1: tests/test_main.ihex
