@@ -1,6 +1,3 @@
-byte 0 len 40 = 0
-	word 6 to 11 = 1111,2222,3333,4444,5555,6666,7777,8888,9999,0aaaa,0bbbb,0cccc
-	word 0 len 20# Usimdbg
 **Usimdbg** is a debugger written to run with Ray Bellis' mc6809 emulator **Usim** ([https://github.com/raybellis/usim/](URL)), it is written in C++.
 ## Functionality
 Command keywords are displayed in mixed case, the upper case part is the short abbreavation.
