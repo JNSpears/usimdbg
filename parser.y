@@ -200,11 +200,12 @@ trace_tail:
          ;
 
 break_tail:
-                        { cpu.dispBreak(); }
-      | exp occurs      { cpu.SetBreakOnExec($1, $2); }
-      | exp XRWA occurs { cpu.SetBreakOnExec($1, $2, $3); }
-      | CLEAR exp       { cpu.UnsetBreak($2); }
-      | TBF             { cpu.SetBreakOnTraceBufferFull(); }
+                            { cpu.dispBreak(); }
+      | exp occurs          { cpu.SetBreakOnExec($1, $2); }
+      | exp XRWA occurs     { cpu.SetBreakOnExec($1, $2, $3); }
+      | exp XRWA exp occurs { cpu.SetBreakOnExec($1, $2, $4, $3); }
+      | CLEAR exp           { cpu.UnsetBreak($2); }
+      | TBF                 { cpu.SetBreakOnTraceBufferFull(); }
       ;
 
 occurs:
