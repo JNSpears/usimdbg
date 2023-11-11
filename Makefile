@@ -45,6 +45,9 @@ depend:
 
 .ONESHELL:
 
+run: tests/test_main.ihex
+	./$(DBIN) tests/test_main.ihex
+
 tests: testsetup test-all report
 
 .PHONY:
@@ -73,7 +76,6 @@ tests/test_main.s19: tests/test_main.s tests/test.s
 	lwasm $< -fsrec -o$(basename $@).s19
 tests/test_main.bin: tests/test_main.s tests/test.s
 	lwasm $< -fraw -o$(basename $@).bin
-
 
 test1: tests/test_main.ihex
 	./$(DBIN) tests/test_main.ihex >tests/$(@).log 2>&1 <<EOF
@@ -198,9 +200,13 @@ test8: tests/test_main.ihex
 	load 'tests/test_main.sym
 	step 6
 	regs
+	.a
 	a=0aa
 	b=0bb
 	x=1111
+	.a
+	.b
+	.x
 	$
 	regs
 	reset
