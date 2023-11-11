@@ -14,6 +14,8 @@
 #include "BreakTrace.h"
 #include "Trigger.h"
 #include "Action.h"
+#include "Symbol.h"
+
 
 using namespace std;
 
@@ -44,7 +46,12 @@ void BreakTraceSubSystem::_dispTrace(long frame_number, int nFrom, int nTo)
         switch (frame.type) // exec, readbyte, writebyte, readword, writeword 
         {
             case exec:
-                fprintf(stderr, "(%03ld) X %04x  %s\r\n", frame_number, frame.addr, frame.text);
+                {
+                    const char *pSymbol = getSymbol(frame.addr);
+                    if (pSymbol)
+                        cout << "                        " << pSymbol << ':' << endl;
+                    fprintf(stderr, "(%03ld) X %04x           %s\r\n", frame_number, frame.addr, frame.text);
+                }
                 break;
             case readbyte:
                 fprintf(stderr, "(%03ld) R   %02X @ %04x\r\n", frame_number, (Byte)frame.data, frame.addr);
