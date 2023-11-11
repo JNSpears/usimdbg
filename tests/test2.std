@@ -18,21 +18,21 @@ PC:E0A2 CC:-F-I---- S:01FA U:0400 A:53 B:00 X:E10A Y:0000 DP:00
 >> trace 999 # all frames
 
 (000) R E000 @ fffe
-(001) X e000  LDS     #$200
-(002) X e004  LDU     #$400
-(003) X e007  ORCC    #$50
-(004) X e009  LEAX    252,PCR
-(005) X e00d  LBSR    $E09E
+(001) X e000           LDS     #$200
+(002) X e004           LDU     #$400
+(003) X e007           ORCC    #$50
+(004) X e009           LEAX    252,PCR
+(005) X e00d           LBSR    $E09E
 (006) W   10 @ 01ff
 (007) W   E0 @ 01fe
-(008) X e09e  PSHS    CC,A,X
+(008) X e09e           PSHS    CC,A,X
 (009) W   09 @ 01fd
 (010) W   E1 @ 01fc
 (011) W   00 @ 01fb
 (012) W   50 @ 01fa
-(013) X e0a0  LDA     ,X+
+(013) X e0a0           LDA     ,X+
 (014) R   53 @ e109
-(015) X e0a2  BEQ     $E0A8
+(015) X e0a2           BEQ     $E0A8
 >> asm $ len 1
 
 E0A4:  8D28        	bsr   e0ce

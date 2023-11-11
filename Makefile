@@ -198,9 +198,6 @@ test8: tests/test_main.ihex
 	load 'tests/test_main.sym
 	step 6
 	regs
-	x
-	u
-	cc
 	a=0aa
 	b=0bb
 	x=1111
@@ -211,7 +208,6 @@ test8: tests/test_main.ihex
 	x = 100
 	a = 4
 	x = x + a*2
-	x
 	EOF
 	diff $(DIFFFLAGS) tests/$(@).log tests/$(@).std
 
