@@ -8,7 +8,7 @@ Display Help text.
 	RESET
 Reset the processor state.
 ### Memory access commands
-	(BYTE|WORD) addr [LEN expr | TO addr] [ '=' expr [, ...]]
+	(BYte|WOrd) addr [LEN expr | TO addr] [ '=' expr [, ...]]
 Display, modify or fill memory.
 
   * **byte** 1234 = 88
@@ -28,7 +28,7 @@ Display, modify or fill memory.
   * **byte** 1000 **len** 1000 = 00,11,22,33,44,55,66,77
 &mdash; Fill a 4K of memory at 4K to 8K with a repeating pattern.
 ### Step command
-	STep [expr]
+	Step [expr]
 Step expr instructions, (default=1) display registers before and disassembly of the executed instruction after.
 ### Go command
 	Go

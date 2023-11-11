@@ -50,13 +50,13 @@
 "<<"           {return LSL;}
 ">>"           {return LSR;}
 
-(ST(EP)?)      {return STEP;}
+^(S(TEP)?)      {return STEP;}
 (G(O)?)        {return GO;}
 (R(EGS)?)      {return REGS;}
 "RESET"        {return RESET;}
 "EVAL"         {return EVAL;}
-(DU(MP)?)      {return DUMP;}
-"LEN"          {return LEN;}
+^(D(UMP)?)     {return DUMP;}
+(L(EN)?)       {return LEN;}
 "TO"           {return TO;}
 (T(R(ACE)?)?)  {return TRACE;}
 (CLEAR)        {return CLEAR;}
@@ -64,8 +64,8 @@
 (TBF)          {return TBF;}
 (HELP)         {return HELP;}
 (QUIT)         {return QUIT;}
-(BYTE)         {return BYTE;}
-(WORD)         {return WORD;}
+(BY(TE)?)      {return BYTE;}
+(WO(RD)?)      {return WORD;}
 (ASM)          {return ASM;}
 (OCCURS)       {return OCCURS;}
 (LOAD)         {return LOAD;}
