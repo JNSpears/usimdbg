@@ -61,7 +61,7 @@ void do_hexadump(mc6809& cpu, int nBytes, int addr)
 %token EQ MULT DIV MOD PLUS MINUS NOT LSL LSR OR XOR AND L_PAREN R_PAREN END
 %token STEP GO REGS RESET EVAL DUMP LEN TO TRACE CLEAR BREAK TBF HELP QUIT
 %token BYTE WORD ASM OCCURS LOAD BASE APPEND SYMBOLS
-%token RD RX RY RU RS RPC RA RB RCC RDP
+%token RD RX RY RU RS RPC RA RB RCC RDP DOT
 
 
 %token <ival> NUMBER
@@ -95,7 +95,7 @@ line:		stmt END
          | /*empty */ END 
          ;
 
-stmt:      exp                      { fprintf(stderr, "%04X\n", $1);}
+stmt:    DOT exp                    { fprintf(stderr, "%04X\n", $2);}
          | EVAL exp                 { 
                                        fprintf(stderr, "\t");
                                        for(DWord mask = 0x00008000; mask; mask = mask>>1)

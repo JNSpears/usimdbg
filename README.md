@@ -8,7 +8,7 @@ Display Help text.
 	RESET
 Reset the processor state.
 ### Memory access commands
-	(BYte|WOrd) addr [LEN expr | TO addr] [ '=' expr [, ...]]
+	(BYte|WOrd) addr [Len expr | TO addr] [ '=' expr [, ...]]
 Display, modify or fill memory.
 
   * **byte** 1234 = 88
@@ -65,18 +65,18 @@ Set, display or clear Breakpoint(s)
   * *id* [= *expr*]
 &mdash; Display or change the value of a register. Registers A, B, CC, D, DP X, Y, U, S, PC (or $)
 ### Trace command
-    Trace [expr | ( addr LEN expr | addr TO addr) | CLEAR]
+    Trace [expr | ( addr Len expr | addr TO addr) | CLEAR]
 Display Trace or clear trace.
 #### Display last *expr* entries in the trace buffer
     Trace expr
 #### Display frame *addr* for *expr* entries in the trace buffer
-    Trace addr LEN expr
+    Trace addr Len expr
 #### Display frame *addr1* to *addr2* entries in the trace buffer
     Trace addr1 TO addr2
 #### Clear the trace buffer
     Trace CLEAR
 ### Asm command
-    ASM [LEN expr | TO addr]
+    ASM addr [Len expr | TO addr]
 Disassemble memory, if symbols are loaded they will be displayed also.
 ### EVAL command
     EVAL expr
@@ -86,7 +86,7 @@ Evaluate experssion and display as binary, octal, decimal hexadecimal and ASCII
 Load a filename into memory, filetypes: iHex, s19, raw/bin extensions, optionally adding a base value to relocate into higher memory. Also load symbols, symbols may be appended to the previously loaded set of symbols. Currently supports 
 loading symbols from lwtools symbol file and mapfile (.sym and .map extensions)
 ### Symbols command
-	SYMbols [addr [LEN expr | TO addr] | 'prefix-text-to-match ]
+	SYMbols [addr [Len expr | TO addr] | 'prefix-text-to-match ]
 Display all symbols currently loaded, a symbol matching a specific address or in a specified range of addresses or symbols matching a givent prefix
 ### Expressions
 Expressions include the flowing:
@@ -103,6 +103,13 @@ The Tilde Escape feature has been extended to include:
 &mdash; Reset the system.
   * B
 &mdash; Break to **Usimdbg**
+
+For the **Percom** specific debugger (see the tools/percom dir in my **6809** repo ([https://github.com/JNSpears/6809.git](URL)))
+
+  * U
+&mdash; Un-mount a virtual disk. &mdash; enter: *drive*
+  * M
+&mdash; Mount a virtual disk. &mdash; enter: *drive* *filename*
 
 ## Build
 This has only been built and tested on Linux, windows should work with cgywin or some other Linux tool set.

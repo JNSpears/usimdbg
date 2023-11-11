@@ -33,6 +33,7 @@
 
 "#".*          { /* ignore comments */ }
 
+"\."           {return DOT;}
 "="            {return EQ;}
 "~"            {return NOT;}
 "-"            {return MINUS;}
