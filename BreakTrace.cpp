@@ -94,15 +94,15 @@ void BreakTraceSubSystem::dispTrace(int nFrames)
     _dispTrace(frame_number, start_ix, end_ix);
 }
 
-bool BreakTraceSubSystem::checkforbreak(void)
-{
-    if (pendingBreak)
-    {
-        pendingBreak = false;
-        return true;
-    }
-    return false;
-}
+// bool BreakTraceSubSystem::checkforbreak(void)
+// {
+//     if (pendingBreak)
+//     {
+//         pendingBreak = false;
+//         return true;
+//     }
+//     return false;
+// }
 
 // breakpoint management.
 
@@ -156,16 +156,16 @@ int BreakTraceSubSystem::add(Trigger &t, const Action &a)
 }
 
 
-bool BreakTraceSubSystem::check_triggers_do_actions(TraceFrame& frame, mc6809& cpu)
+bool BreakTraceSubSystem::check_triggers_doActions(TraceFrame& frame, mc6809& cpu)
 {
     bool ret_val = false;
     for (int ix=0; ix < MAX_BREAKPOINTS; ix++)
     {
         if (TrigAct[ix].t)
         {
-            if (TrigAct[ix].t->triggered(frame, false))
+            if (TrigAct[ix].t->isTriggered(frame, false))
             {
-                if (TrigAct[ix].a->do_action(cpu))
+                if (TrigAct[ix].a->doAction(cpu))
                     ret_val = true;
             }
         }
@@ -185,7 +185,7 @@ void BreakTraceSubSystem::traceReadWord(mc6809& cpu, Word addr, Word val)
     execHistory[execHistoryIx++ % MAX_EXEC_HISTORY] = frame;
 
     // check for r/w breaks;
-    pendingBreak = check_triggers_do_actions(frame, cpu);
+    pendingBreak |= check_triggers_doActions(frame, cpu);
 }
 
 // Hooks for read read/write
@@ -199,7 +199,7 @@ void BreakTraceSubSystem::traceReadByte(mc6809& cpu, Word addr, Byte val)
     execHistory[execHistoryIx++ % MAX_EXEC_HISTORY] = frame;
 
     // check for r/w breaks;
-    pendingBreak = check_triggers_do_actions(frame, cpu);
+    pendingBreak = check_triggers_doActions(frame, cpu);
 }
 
 void BreakTraceSubSystem::traceWriteWord(mc6809& cpu, Word addr, Word val)
@@ -211,7 +211,7 @@ void BreakTraceSubSystem::traceWriteWord(mc6809& cpu, Word addr, Word val)
     execHistory[execHistoryIx++ % MAX_EXEC_HISTORY] = frame;
 
     // check for r/w breaks;
-    pendingBreak = check_triggers_do_actions(frame, cpu);
+    pendingBreak = check_triggers_doActions(frame, cpu);
 }
 
 void BreakTraceSubSystem::traceWriteByte(mc6809& cpu, Word addr, Byte val)
@@ -223,7 +223,7 @@ void BreakTraceSubSystem::traceWriteByte(mc6809& cpu, Word addr, Byte val)
     execHistory[execHistoryIx++ % MAX_EXEC_HISTORY] = frame;
 
     // check for r/w breaks;
-    pendingBreak = check_triggers_do_actions(frame, cpu);
+    pendingBreak = check_triggers_doActions(frame, cpu);
 }
 
 
@@ -241,7 +241,7 @@ void BreakTraceSubSystem::traceExec(mc6809& cpu, Word addr)
     execHistory[lastExecIx] = frame;
 
     // // check for x breaks;
-    // pendingBreak = check_triggers_do_actions(frame, cpu);
+    // pendingBreak = check_triggers_doActions(frame, cpu);
 }
 
 
@@ -255,7 +255,7 @@ void BreakTraceSubSystem::traceExecUPDATE(mc6809& cpu, std::string text)
     execHistory[lastExecIx] = frame;
 
     // check for EXEC breaks;
-    pendingBreak = check_triggers_do_actions(frame, cpu);
+    pendingBreak = check_triggers_doActions(frame, cpu);
 }
 
 void BreakTraceSubSystem::clearTraceBuffer(void)
@@ -276,7 +276,7 @@ TriggerNever::TriggerNever(void) : Trigger("TriggerNever")
 {
 }
 
-bool TriggerNever::triggered(TraceFrame& frame, bool silent)
+bool TriggerNever::isTriggered(TraceFrame& frame, bool silent)
 {
     (void)frame;
     (void)silent;
@@ -299,9 +299,9 @@ void TriggerOnPc::display(void) const
     cerr << ": pc=" << hex << uppercase << setw(4) << setfill('0')  << expected;
 }
 
-bool TriggerOnPc::triggered(TraceFrame& frame, bool silent)
+bool TriggerOnPc::isTriggered(TraceFrame& frame, bool silent)
 {
-    // fprintf(stderr, "TriggerOnPc::triggered frame.addr=%04x expected=%04x ---> %d\r\n", frame.addr, expected, (frame.addr == expected));
+    // fprintf(stderr, "TriggerOnPc::isTriggered frame.addr=%04x expected=%04x ---> %d\r\n", frame.addr, expected, (frame.addr == expected));
     bool ret_val = ((frame.addr == expected) && (frame.type == exec));
     if (ret_val && !silent)
         displayOccurred();
@@ -324,10 +324,11 @@ void TriggerOnReadWrite::display(void) const
     cerr << ": @=" << hex << uppercase << setw(4) << setfill('0') << addr << ' ' << type;
 }
 
-bool TriggerOnReadWrite::triggered(TraceFrame& frame, bool silent)
+bool TriggerOnReadWrite::isTriggered(TraceFrame& frame, bool silent)
 {
     bool accessmode = false;
-    // fprintf(stderr, "TriggerOnReadWrite::triggered(c)\r\n");
+    // cerr << "TriggerOnReadWrite::isTriggered( slient=" << silent << ") ";
+    // cerr << ": @=" << hex << uppercase << setw(4) << setfill('0') << addr << ' ' << type << endl;
     switch(type)
     {
     case 'r':
@@ -363,9 +364,9 @@ void TriggerOnReadWriteValue::display(void) const
     cerr << " =" << hex << uppercase << setw(4) << setfill('0') << _value;
 }
 
-bool TriggerOnReadWriteValue::triggered(TraceFrame& frame, bool silent)
+bool TriggerOnReadWriteValue::isTriggered(TraceFrame& frame, bool silent)
 {
-    const bool ret_val = (TriggerOnReadWrite::triggered(frame) && (frame.data == _value));
+    const bool ret_val = (TriggerOnReadWrite::isTriggered(frame, true) && (frame.data == _value));
     if (ret_val && !silent)
         displayOccurred();
     return ret_val;
@@ -381,7 +382,7 @@ TriggerTraceBufferFull::~TriggerTraceBufferFull()
 {
 }
 
-bool TriggerTraceBufferFull::triggered(TraceFrame& frame, bool silent)
+bool TriggerTraceBufferFull::isTriggered(TraceFrame& frame, bool silent)
 {
     (void)frame;
     const bool ret_val = (BrkTrc.isTraceBufferFull());
@@ -392,18 +393,6 @@ bool TriggerTraceBufferFull::triggered(TraceFrame& frame, bool silent)
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
-// class TriggerEventCount: public Trigger {
-// public:
-//     TriggerEventCount(const Trigger &_event, int count);
-//     virtual ~TriggerEventCount(void);
-
-//     virtual bool triggered(TraceFrame& frame, bool silent=false);
-
-// protected:
-//     const Trigger &event;
-//     int count;
-// };
-
 TriggerEventCount::TriggerEventCount(Trigger *_event, int _count)
 : Trigger("TriggerEventCount"), event(*_event), count(_count)
 {
@@ -413,11 +402,11 @@ TriggerEventCount::~TriggerEventCount()
 {
 }
 
-bool TriggerEventCount::triggered(TraceFrame& frame, bool silent)
+bool TriggerEventCount::isTriggered(TraceFrame& frame, bool silent)
 {
     (void)frame;
     (void)silent;
-    bool ret_val = (event.triggered(frame, true));
+    bool ret_val = (event.isTriggered(frame, true));
     if (ret_val && count)
     {
         count--;
@@ -461,7 +450,7 @@ ActionNone::ActionNone()
 {
 }
 
-bool ActionNone::do_action(mc6809& cpu) const
+bool ActionNone::doAction(mc6809& cpu) const
 {
     (void)cpu;
     return false;
@@ -477,9 +466,9 @@ ActionBreak::~ActionBreak()
 {
 }
 
-bool ActionBreak::do_action(mc6809& cpu) const
+bool ActionBreak::doAction(mc6809& cpu) const
 {
-    (void)cpu;
+    cpu.halt();
     return true;
 }
 
@@ -489,7 +478,7 @@ ActionAnotate::ActionAnotate(const char* const str)
 {
 }
 
-bool ActionAnotate::do_action(mc6809& cpu) const
+bool ActionAnotate::doAction(mc6809& cpu) const
 {
     (void)cpu;
     cerr << "--->>" << _str << endl;
@@ -503,7 +492,7 @@ bool ActionAnotate::do_action(mc6809& cpu) const
 // {
 // }
 
-// void ActionTron::do_action(mc6809& cpu) const
+// void ActionTron::doAction(mc6809& cpu) const
 // {
 //     cpu.tron();
 // }
@@ -513,7 +502,7 @@ bool ActionAnotate::do_action(mc6809& cpu) const
 // {
 // }
 
-// void ActionTroff::do_action(mc6809& cpu) const
+// void ActionTroff::doAction(mc6809& cpu) const
 // {
 //     cpu.troff();
 // }
@@ -524,7 +513,7 @@ bool ActionAnotate::do_action(mc6809& cpu) const
 // {
 // }
 
-// void ActionHexDump::do_action(mc6809dbgDebugCore& cpu) const
+// void ActionHexDump::doAction(mc6809dbgDebugCore& cpu) const
 // {
 //     (void)cpu;
 

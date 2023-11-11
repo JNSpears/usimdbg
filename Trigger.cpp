@@ -33,7 +33,7 @@ void Trigger::displayOccurred(void) const
     cerr << " **\r\n";
 }
 
-bool Trigger::triggered(TraceFrame& frame, bool silent)
+bool Trigger::isTriggered(TraceFrame& frame, bool silent)
 {
     (void)frame;
     (void)silent;

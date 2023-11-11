@@ -16,9 +16,9 @@ Action::~Action()
 {
 }
 
-bool Action::do_action(mc6809& cpu) const
+bool Action::doAction(mc6809& cpu) const
 {
 	(void)cpu;
-	fprintf(stderr, "Action::do_action()\r\n");
+	fprintf(stderr, "Action::doAction()\r\n");
     return false;
 }

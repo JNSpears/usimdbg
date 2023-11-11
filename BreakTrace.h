@@ -56,21 +56,20 @@ public:
 	void traceWriteWord(mc6809& cpu, Word addr, Word val);
 	void traceWriteByte(mc6809& cpu, Word addr, Byte val);
 
-	bool checkforbreak(void);
+	// bool checkforbreak(void);
 
 	void clearExecBreak(int index);
 	void dispExecBreaks(void);
 
 	int add(Trigger &t, const Action &a);
 
-	bool check_triggers_do_actions(TraceFrame& frame, mc6809& cpu);
-	bool pendingBreak;
-
 	void clearTraceBuffer(void);
 	bool isTraceBufferFull(void) const;
 
 protected:
+	bool check_triggers_doActions(TraceFrame& frame, mc6809& cpu);
 	struct TriggerAction	TrigAct[MAX_BREAKPOINTS];
+	bool pendingBreak;
 
 private:
     long	execHistoryIx;
@@ -88,7 +87,7 @@ public:
 	TriggerNever();
 	// virtual ~TriggerNever(void);
 
-	virtual bool triggered(TraceFrame& frame, bool silent=false);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 };
 
 ////////////////////////////////////////////////////////////
@@ -97,7 +96,7 @@ public:
 	TriggerOnPc(Word expected);
 	virtual ~TriggerOnPc(void);
 
-	virtual bool triggered(TraceFrame& frame, bool silent=false);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 
 	virtual void display(void) const;
 
@@ -111,7 +110,7 @@ public:
 	TriggerOnReadWrite(Word _addr, char _type);
 	virtual ~TriggerOnReadWrite(void);
 
-	virtual bool triggered(TraceFrame& frame, bool silent=false);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 
 	virtual void display(void) const;
 
@@ -124,9 +123,9 @@ protected:
 class TriggerOnReadWriteValue: public TriggerOnReadWrite {
 public:
 	TriggerOnReadWriteValue(const Word offset, char _type, const Word value);
-	~TriggerOnReadWriteValue();
+	virtual ~TriggerOnReadWriteValue();
 
-	virtual bool triggered(TraceFrame& frame, bool silent=false);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 
 	virtual void display(void) const;
 
@@ -140,7 +139,7 @@ public:
 	TriggerTraceBufferFull(const BreakTraceSubSystem &_BrkTrc);
 	virtual ~TriggerTraceBufferFull(void);
 
-	virtual bool triggered(TraceFrame& frame, bool silent=false);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 
 protected:
 	const BreakTraceSubSystem &BrkTrc;
@@ -152,7 +151,7 @@ public:
 	TriggerEventCount(Trigger *_event, int _count);
 	virtual ~TriggerEventCount(void);
 
-	virtual bool triggered(TraceFrame& frame, bool silent=false);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 	virtual void display(void) const;
 
 protected:
@@ -166,14 +165,14 @@ protected:
 class ActionNone: public Action {
 public:
 	ActionNone();
-	virtual bool do_action(mc6809& cpu) const;
+	virtual bool doAction(mc6809& cpu) const;
 };
 
 ////////////////////////////////////////////////////////////
 class ActionAnotate: public Action {
 public:
 	ActionAnotate(const char* const str);
-	virtual bool do_action(mc6809& cpu) const;
+	virtual bool doAction(mc6809& cpu) const;
 private:
 	const char* const _str;
 };
@@ -182,12 +181,12 @@ private:
 class ActionTron: public Action {
 public:
 	ActionTron();
-	virtual bool do_action(mc6809& cpu) const;
+	virtual bool doAction(mc6809& cpu) const;
 };
 class ActionTroff: public Action {
 public:
 	ActionTroff();
-	virtual bool do_action(mc6809& cpu) const;
+	virtual bool doAction(mc6809& cpu) const;
 };
 
 ////////////////////////////////////////////////////////////
@@ -195,14 +194,14 @@ class ActionBreak: public Action {
 public:
 	ActionBreak();
 	virtual ~ActionBreak();
-	virtual bool do_action(mc6809& cpu) const; // mc6809DebugCore& cpu
+	virtual bool doAction(mc6809& cpu) const; // mc6809DebugCore& cpu
 };
 
 // ////////////////////////////////////////////////////////////
 // class ActionHexDump: public Action {
 // public:
 // 	ActionHexDump(const char * const pAnotation, const Word offset, const Word len);
-// 	virtual void do_action(mc6809dbgDebugCore& cpu) const;
+// 	virtual void doAction(mc6809dbgDebugCore& cpu) const;
 // private:
 // 	const char * const _pAnotation;
 // 	const Word _offset;

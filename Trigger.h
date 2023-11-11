@@ -33,7 +33,7 @@ public:
 	virtual void display(void) const;
 	virtual void displayOccurred(void) const;
 
-	virtual bool triggered(TraceFrame& frame, bool silent);
+	virtual bool isTriggered(TraceFrame& frame, bool silent=false);
 
 	const char* name;
 };

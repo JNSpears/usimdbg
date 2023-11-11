@@ -21,9 +21,9 @@ public:
 	virtual ~Action();
 
 public:
-	using shared_ptr = std::shared_ptr<Action>;
+	// using shared_ptr = std::shared_ptr<Action>;
 
-	virtual bool do_action(mc6809& cpu) const;
+	virtual bool doAction(mc6809& cpu) const;
 	const char* name;
 };
 

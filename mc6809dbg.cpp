@@ -52,8 +52,8 @@ void mc6809dbg::tick()
 	snprintf(text, 50, "%-8s%s", insn, disasm_operand().c_str());
 	BrkTrc.traceExecUPDATE(*this, text);
 
-	if (BrkTrc.checkforbreak())
-		halt();
+	// if (BrkTrc.checkforbreak())
+	// 	halt();
 }
 
 
@@ -164,7 +164,6 @@ void mc6809dbg::SetBreakOnExec(Word addr, EBrkTyp brktyp, int occurs, DWord opt_
 			setBreak(act, trig, occurs);
 		}
 		break;
-
 	}
 }
 
