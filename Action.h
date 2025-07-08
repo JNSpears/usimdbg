@@ -8,6 +8,7 @@
 #ifndef TOOLS_USIM_PERCOM_ACTION_H_
 #define TOOLS_USIM_PERCOM_ACTION_H_
 
+#include <stdio.h>
 #include <memory>
 #include <vector>
 #include <functional>
